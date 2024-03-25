@@ -1,9 +1,13 @@
 #ifndef tld_kyber
 #define tld_kyber
 
+#include <cstring>
+#include <cmath>
+#include <stdexcept>
+
 namespace kyber {
 	const int n = 256;
-	const int n_ = 9;
+	const int _n = 9;
 	const int q = 3329;
 
 	unsigned char* BytesToBits(unsigned char* B, unsigned int k) {
@@ -21,6 +25,30 @@ namespace kyber {
 		}
 
 		return _B;
+	}
+
+	int reduce(int r, int a) {
+		if (a % 2 == 1) {
+			a -= 1;
+		}
+
+		for (int _r = a/2; _r > -a/2; _r++) {
+			if (_r == r % a) {
+				return _r;
+			}
+		}
+
+		throw std::invalid_argument("Given params to reduce do not have r % a in -a/2 < r < a/2");
+	}
+
+	int reducePos(int r, int a) {
+		for (int _r = 0; _r < a; _r++) {
+			if (_r == r % a) {
+				return _r;
+			}
+		}
+
+		throw std::invalid_argument("Given params to reduce do not have r % a in 0 < r < a");
 	}
 }
 
