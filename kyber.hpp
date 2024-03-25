@@ -1,6 +1,8 @@
 #ifndef tld_kyber
 #define tld_kyber
 
+// SPEC: https://pq-crystals.org/kyber/data/kyber-specification-round3-20210804.pdf
+
 #include <cstring>
 #include <cmath>
 #include <stdexcept>
