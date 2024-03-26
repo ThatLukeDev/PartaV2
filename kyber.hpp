@@ -7,6 +7,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <vector>
+#include <random>
 
 namespace kyber {
 	const int n = 256;
@@ -96,6 +97,14 @@ namespace kyber {
 		}
 
 		return _wMax;
+	}
+
+	int compress(int x, int d) {
+		return reducePos(std::round((double(std::pow(2, d)) / q) * x), std::pow(2, d));
+	}
+
+	int decompress(int x, int d) {
+		return std::round((q / double(std::pow(2, d))) * x);
 	}
 }
 
