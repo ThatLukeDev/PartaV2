@@ -64,9 +64,9 @@ namespace sha3 {
 			for (int i = 0; i < 24; i++) {
 				for (int z = 0; z < _p.w; z++) {
 					state[x][y][z/8] = setBit(state[x][y][z/8], z%8, getBit(a[x][y][(z-(((t+1)*(t+2))/2)%_p.w)/8], (z-(((t+1)*(t+2))/2)%_p.w)%8));
-				int t = y;
-				y = (2*x + 3*y) % 5;
-				x = t;
+					int t = y;
+					y = (2*x + 3*y) % 5;
+					x = t;
 				}
 			}
 		}
