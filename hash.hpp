@@ -17,6 +17,17 @@ namespace sha3 {
 		return (b & ~(1 << x)) | (v << x);
 	}
 
+	unsigned char getState(unsigned char* state, params _p, unsigned char x, unsigned char y, unsigned char z) {
+		// state array is w(5y + x) + z
+		unsigned char bit = _p.w*(5*y + x) + z;
+		return getBit(state[bit/8], bit%8);
+	}
+	unsigned char setState(unsigned char* state, params _p, unsigned char x, unsigned char y, unsigned char z, unsigned char v) {
+		// state array is w(5y + x) + z
+		unsigned char bit = _p.w*(5*y + x) + z;
+		return setBit(state[bit/8], bit%8, v);
+	}
+
 	unsigned char* keccak_f(unsigned char* in, params _p) {
 		unsigned int t = std::sqrt(_p.w);
 
@@ -70,6 +81,10 @@ namespace sha3 {
 				y = (2*x + 3*y) % 5;
 				x = t;
 			}
+		}
+
+		// pi : rearrange lanes
+		{
 		}
 
 		return nullptr;
