@@ -28,6 +28,15 @@ namespace sha3 {
 		return setBit(state[bit/8], bit%8, v);
 	}
 
+	unsigned char getAdjState(unsigned char* state, params _p, unsigned char x, unsigned char y, unsigned char z) {
+		// state array is x[3,4,0,1,2] y[3,4,0,1,2] z[0..63]
+		return getState(state, _p, (x + 3) % 5, (y + 3) % 5, z);
+	}
+	unsigned char setAdjState(unsigned char* state, params _p, unsigned char x, unsigned char y, unsigned char z, unsigned char v) {
+		// state array is x[3,4,0,1,2] y[3,4,0,1,2] z[0..63]
+		return setState(state, _p, (x + 3) % 5, (y + 3) % 5, z, v);
+	}
+
 	unsigned char* keccak_f(unsigned char* in, params _p) {
 		unsigned int t = std::sqrt(_p.w);
 
