@@ -22,25 +22,25 @@ namespace sha3 {
 		unsigned char bit = _p.w*(5*y + x) + z;
 		return getBit(state[bit/8], bit%8);
 	}
-	unsigned char setState(unsigned char* state, params _p, unsigned char x, unsigned char y, unsigned char z, unsigned char v) {
+	void setState(unsigned char* state, params _p, unsigned char x, unsigned char y, unsigned char z, unsigned char v) {
 		// state array is w(5y + x) + z
 		unsigned char bit = _p.w*(5*y + x) + z;
-		return setBit(state[bit/8], bit%8, v);
+		state[bit/8] = setBit(state[bit/8], bit%8, v);
 	}
 
 	unsigned char getAdjState(unsigned char* state, params _p, unsigned char x, unsigned char y, unsigned char z) {
 		// state array is x[3,4,0,1,2] y[3,4,0,1,2] z[0..63]
 		return getState(state, _p, (x + 3) % 5, (y + 3) % 5, z);
 	}
-	unsigned char setAdjState(unsigned char* state, params _p, unsigned char x, unsigned char y, unsigned char z, unsigned char v) {
+	void setAdjState(unsigned char* state, params _p, unsigned char x, unsigned char y, unsigned char z, unsigned char v) {
 		// state array is x[3,4,0,1,2] y[3,4,0,1,2] z[0..63]
-		return setState(state, _p, (x + 3) % 5, (y + 3) % 5, z, v);
+		setState(state, _p, (x + 3) % 5, (y + 3) % 5, z, v);
 	}
 
 	unsigned char* keccak_f(unsigned char* in, params _p) {
 		unsigned int t = std::sqrt(_p.w);
 
-		unsigned char state[5][5][t];
+		unsigned char* state;
 		memcpy(state, in, t * 25);
 
 		// theta : xor parity of each neighbouring column respectively
@@ -50,11 +50,11 @@ namespace sha3 {
 
 			for (int x = 0; x < 5; x++) {
 				for (int z = 0; z < _p.w; z++) {
-					c[x][z] = setBit(c[x][z/8], z%8, getBit(state[x][0][z/8], z%8)
-						^ getBit(state[x][1][z/8], z%8)
-						^ getBit(state[x][2][z/8], z%8)
-						^ getBit(state[x][3][z/8], z%8)
-						^ getBit(state[x][4][z/8], z%8));
+					c[x][z] = setBit(c[x][z/8], z%8, getAdjState(state, _p, x, 0, z)
+						^ getAdjState(state, _p, x, 1, z)
+						^ getAdjState(state, _p, x, 2, z)
+						^ getAdjState(state, _p, x, 3, z)
+						^ getAdjState(state, _p, x, 4, z));
 				}
 			}
 			for (int x = 0; x < 5; x++) {
@@ -66,7 +66,7 @@ namespace sha3 {
 			for (int x = 0; x < 5; x++) {
 				for (int y = 0; y < 5; y++) {
 					for (int z = 0; z < _p.w; z++) {
-						state[x][y][z] = setBit(state[x][y][z/8], z%8, getBit(d[x][z/8], z%8)
+						setAdjState(state, _p, x, y, z, getBit(d[x][z/8], z%8)
 							^ getBit(d[x][z/8], z%8));
 					}
 				}
@@ -75,7 +75,7 @@ namespace sha3 {
 
 		// rho : rotate each w by triangular numbers
 		{
-			unsigned char a[5][5][t];
+			unsigned char a[25*t];
 			memcpy(a, state, t * 25);
 
 			int x = 1;
@@ -83,7 +83,7 @@ namespace sha3 {
 
 			for (int i = 0; i < 24; i++) {
 				for (int z = 0; z < _p.w; z++) {
-					state[x][y][z/8] = setBit(state[x][y][z/8], z%8, getBit(a[x][y][(z-(((t+1)*(t+2))/2)%_p.w)/8], (z-(((t+1)*(t+2))/2)%_p.w)%8));
+					setAdjState(state, _p, x, y, z, getAdjState(a, _p, x, y, (z-(i+1)*(i+2)/2)) % _p.w);
 				}
 
 				int t = y;
