@@ -29,6 +29,36 @@ namespace sha3 {
 			}
 		}
 
+		// theta
+		{
+			unsigned char c[5][_p.w];
+			unsigned char d[5][_p.w];
+
+			for (int x = 0; x < 5; x++) {
+				for (int z = 0; z < _p.w; z++) {
+					c[x][z] = state[x][0][z];
+					c[x][z] ^= state[x][1][z];
+					c[x][z] ^= state[x][2][z];
+					c[x][z] ^= state[x][3][z];
+					c[x][z] ^= state[x][4][z];
+				}
+			}
+
+			for (int x = 0; x < 5; x++) {
+				for (int z = 0; z < _p.w; z++) {
+					d[x][z] = c[(x-1)%5][z] ^ c[(x+1)%5][(z-1)%_p.w];
+				}
+			}
+
+			for (int x = 0; x < 5; x++) {
+				for (int y = 0; y < 5; y++) {
+					for (int z = 0; z < _p.w; z++) {
+						state[x][y][z] ^= d[x][z];
+					}
+				}
+			}
+		}
+
 		return nullptr;
 	}
 
