@@ -35,8 +35,8 @@ namespace sha3 {
 		return R;
 	}
 
-	unsigned char* keccak_f(unsigned char* in, params _p) {
-		unsigned int rT = std::sqrt(_p.w);
+	void Rnd(unsigned char* in, int ir, params _p) {
+		unsigned int rT = int(std::log2(_p.w));
 
 		unsigned char state[5][5][_p.w];
 		for (int x = 0; x < 5; x++) {
@@ -46,8 +46,6 @@ namespace sha3 {
 				}
 			}
 		}
-
-		int ir = 0;
 
 		// theta
 		{
@@ -144,7 +142,13 @@ namespace sha3 {
 			}
 		}
 
-		return nullptr;
+		for (int x = 0; x < 5; x++) {
+			for (int y = 0; y < 5; y++) {
+				for (int z = 0; z < _p.w; z++) {
+					in[((x*5)+y)*(_p.w/8)+z/8] = setBit(in[((x*5)+y)*(_p.w/8)+z/8], z%8, state[x][y][z]);
+				}
+			}
+		}
 	}
 
 	unsigned char* digest(unsigned char* _data, unsigned int _len, params _p) {
