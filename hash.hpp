@@ -17,6 +17,24 @@ namespace sha3 {
 		return (b & ~(1 << x)) | (v << x);
 	}
 
+	unsigned char rc(int t) {
+		if (t % 255 == 0) {
+			return 1;
+		}
+
+		unsigned char R = 0b10000000;
+
+		for (int i = 1; i <= t % 255; i++) {
+			R >>= 1;
+			R = setBit(R, 0, getBit(R, 0) ^ getBit(R, 8));
+			R = setBit(R, 4, getBit(R, 4) ^ getBit(R, 8));
+			R = setBit(R, 5, getBit(R, 5) ^ getBit(R, 8));
+			R = setBit(R, 6, getBit(R, 6) ^ getBit(R, 8));
+		}
+
+		return R;
+	}
+
 	unsigned char* keccak_f(unsigned char* in, params _p) {
 		unsigned int rT = std::sqrt(_p.w);
 
@@ -28,6 +46,8 @@ namespace sha3 {
 				}
 			}
 		}
+
+		int ir = 0;
 
 		// theta
 		{
@@ -109,6 +129,19 @@ namespace sha3 {
 			}
 
 			memcpy(state, a, 5*5*_p.w);
+		}
+
+		// iota
+		{
+			unsigned char RC[_p.w] = {0};
+
+			for (int j = 0; j < rT; j++) {
+				RC[int(std::pow(2, j))-1] = rc(j + 7*ir);
+			}
+
+			for (int z = 0; z < _p.w; z++) {
+				state[0][0][z] ^= RC[z];
+			}
 		}
 
 		return nullptr;
