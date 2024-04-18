@@ -46,7 +46,7 @@ namespace sha3 {
 
 			for (int x = 0; x < 5; x++) {
 				for (int z = 0; z < _p.w; z++) {
-					d[x][z] = c[(x-1)%5][z] ^ c[(x+1)%5][(z-1)%_p.w];
+					d[x][z] = c[(x-1+5)%5][z] ^ c[(x+1+5)%5][(z-1+_p.w)%_p.w];
 				}
 			}
 
