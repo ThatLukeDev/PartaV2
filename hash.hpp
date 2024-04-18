@@ -81,6 +81,22 @@ namespace sha3 {
 			memcpy(state, a, 5*5*_p.w);
 		}
 
+		// pi
+		{
+			unsigned char a[5][5][_p.w];
+			memcpy(a, state, 5*5*_p.w);
+
+			for (int x = 0; x < 5; x++) {
+				for (int y = 0; y < 5; y++) {
+					for (int z = 0; z < _p.w; z++) {
+						a[x][y][z] = state[(x+3*y)%5][x][z];
+					}
+				}
+			}
+
+			memcpy(state, a, 5*5*_p.w);
+		}
+
 		return nullptr;
 	}
 
