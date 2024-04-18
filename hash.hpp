@@ -59,6 +59,28 @@ namespace sha3 {
 			}
 		}
 
+		// rho
+		{
+			unsigned char a[5][5][_p.w] = {0};
+			for (int z = 0; z < _p.w; z++) {
+				a[0][0][z] = state[0][0][z];
+			}
+
+			int x = 1;
+			int y = 0;
+
+			for (int t = 0; t < 24; t++) {
+				for (int z = 0; z < _p.w; z++) {
+					a[x][y][z] = state[x][y][(z-(((t+1)*(t+2))/2)+_p.w)%_p.w];
+				}
+				int tmp = y;
+				y = (2*x+3*y)%5;
+				x = tmp;
+			}
+
+			memcpy(state, a, 5*5*_p.w);
+		}
+
 		return nullptr;
 	}
 
