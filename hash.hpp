@@ -42,7 +42,7 @@ namespace sha3 {
 		for (int x = 0; x < 5; x++) {
 			for (int y = 0; y < 5; y++) {
 				for (int z = 0; z < _p.w; z++) {
-					state[x][y][z] = getBit(in[x*y*(z/8)], z%8);
+					state[x][y][z] = in[((x*5)+y)*(_p.w)+z];
 				}
 			}
 		}
@@ -145,7 +145,39 @@ namespace sha3 {
 		for (int x = 0; x < 5; x++) {
 			for (int y = 0; y < 5; y++) {
 				for (int z = 0; z < _p.w; z++) {
-					in[((x*5)+y)*(_p.w/8)+z/8] = setBit(in[((x*5)+y)*(_p.w/8)+z/8], z%8, state[x][y][z]);
+					in[((x*5)+y)*(_p.w)+z] = state[x][y][z];
+				}
+			}
+		}
+	}
+
+	void keccak_f(unsigned char* in, params _p) {
+		unsigned int rT = int(std::log2(_p.w));
+		unsigned int nr = 12 + 2 * rT;
+
+		unsigned char state[5][5][_p.w];
+		for (int x = 0; x < 5; x++) {
+			for (int y = 0; y < 5; y++) {
+				for (int z = 0; z < _p.w; z++) {
+					state[x][y][z] = getBit(in[((y*5)+x)*(_p.w/8)+z/8], z%8);
+				}
+			}
+		}
+
+		for (int ir = 12 + 2*rT - nr; ir < 12 + 2*rT; ir++) {
+			Rnd((unsigned char*)state, ir, _p);
+		}
+
+		int i = 0;
+		for (int y = 0; y < 5; y++) {
+			for (int x = 0; x < 5; x++) {
+				for (int zD8 = 0; zD8 < _p.w/8; zD8++) {
+					in[i] = state[x][y][zD8*8];
+					for (int zM8 = 1; zM8 < 8; zM8++) {
+						in[i] |= state[x][y][zD8*8+zM8] << zM8;
+					}
+
+					i++;
 				}
 			}
 		}
