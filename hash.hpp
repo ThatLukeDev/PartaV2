@@ -5,16 +5,25 @@
 #include <cstring>
 
 namespace sha3 {
+	template <typename T>
+	T swap(T a) {
+		T _out = a;
+		for (unsigned int i = 0; i < sizeof(T); i++) {
+			*((char*)(&_out) + i) = *((char*)(&a) + sizeof(T) - 1 - i);
+		}
+		return _out;
+	}
+
 	struct params {
 		unsigned int rate;
 		unsigned int w = 64;
 	};
 
 	unsigned char getBit(unsigned char b, unsigned char x) {
-		return (b & (1 << x)) >> (x);
+		return (b & (1 << (7-x))) >> (7-x);
 	}
 	unsigned char setBit(unsigned char b, unsigned char x, unsigned char v) {
-		return (b & ~(1 << x)) | (v << x);
+		return (b & ~(1 << (7-x))) | (v << (7-x));
 	}
 
 	unsigned char rc(int t) {
@@ -25,14 +34,15 @@ namespace sha3 {
 		unsigned char R = 0b10000000;
 
 		for (int i = 1; i <= t % 255; i++) {
+			unsigned char R8 = R & 0b00000001;
 			R >>= 1;
-			R = setBit(R, 0, getBit(R, 0) ^ getBit(R, 8));
-			R = setBit(R, 4, getBit(R, 4) ^ getBit(R, 8));
-			R = setBit(R, 5, getBit(R, 5) ^ getBit(R, 8));
-			R = setBit(R, 6, getBit(R, 6) ^ getBit(R, 8));
+			R = setBit(R, 0, getBit(R, 0) ^ R8);
+			R = setBit(R, 4, getBit(R, 4) ^ R8);
+			R = setBit(R, 5, getBit(R, 5) ^ R8);
+			R = setBit(R, 6, getBit(R, 6) ^ R8);
 		}
 
-		return R;
+		return getBit(R, 0);
 	}
 
 	void Rnd(unsigned char* in, int ir, params _p) {
@@ -64,7 +74,7 @@ namespace sha3 {
 
 			for (int x = 0; x < 5; x++) {
 				for (int z = 0; z < _p.w; z++) {
-					d[x][z] = c[(x-1+5)%5][z] ^ c[(x+1+5)%5][(z-1+_p.w)%_p.w];
+					d[x][z] = c[(x-1+5)%5][z] ^ c[(x+1)%5][(z-1+_p.w)%_p.w];
 				}
 			}
 
@@ -164,17 +174,21 @@ namespace sha3 {
 			}
 		}
 
+		int rcount4 = 0;
 		for (int ir = 12 + 2*rT - nr; ir < 12 + 2*rT; ir++) {
 			Rnd((unsigned char*)state, ir, _p);
+			rcount4++;
+			if (rcount4 > 1)
+				break;
 		}
 
 		int i = 0;
 		for (int y = 0; y < 5; y++) {
 			for (int x = 0; x < 5; x++) {
 				for (int zD8 = 0; zD8 < _p.w/8; zD8++) {
-					in[i] = state[x][y][zD8*8];
+					in[i] = state[x][y][zD8*8] << 7;
 					for (int zM8 = 1; zM8 < 8; zM8++) {
-						in[i] |= state[x][y][zD8*8+zM8] << zM8;
+						in[i] |= state[x][y][zD8*8+zM8] << (7-zM8);
 					}
 
 					i++;
