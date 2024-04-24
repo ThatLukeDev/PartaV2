@@ -20,10 +20,10 @@ namespace sha3 {
 	};
 
 	unsigned char getBit(unsigned char b, unsigned char x) {
-		return (b & (1 << (7-x))) >> (7-x);
+		return (b & (1 << (x))) >> (x);
 	}
 	unsigned char setBit(unsigned char b, unsigned char x, unsigned char v) {
-		return (b & ~(1 << (7-x))) | (v << (7-x));
+		return (b & ~(1 << (x))) | (v << (x));
 	}
 
 	unsigned char rc(int t) {
@@ -64,17 +64,18 @@ namespace sha3 {
 
 			for (int x = 0; x < 5; x++) {
 				for (int z = 0; z < _p.w; z++) {
-					c[x][z] = state[x][0][z];
-					c[x][z] ^= state[x][1][z];
-					c[x][z] ^= state[x][2][z];
-					c[x][z] ^= state[x][3][z];
-					c[x][z] ^= state[x][4][z];
+					c[x][z] = state[x][0][z]
+						^ state[x][1][z]
+						^ state[x][2][z]
+						^ state[x][3][z]
+						^ state[x][4][z];
 				}
 			}
 
 			for (int x = 0; x < 5; x++) {
 				for (int z = 0; z < _p.w; z++) {
-					d[x][z] = c[(x-1+5)%5][z] ^ c[(x+1)%5][(z-1+_p.w)%_p.w];
+					d[x][z] = c[(x+4)%5][z]
+						^ c[(x+1)%5][(z-1+_p.w)%_p.w];
 				}
 			}
 
@@ -186,9 +187,9 @@ namespace sha3 {
 		for (int y = 0; y < 5; y++) {
 			for (int x = 0; x < 5; x++) {
 				for (int zD8 = 0; zD8 < _p.w/8; zD8++) {
-					in[i] = state[x][y][zD8*8] << 7;
+					in[i] = state[x][y][zD8*8];
 					for (int zM8 = 1; zM8 < 8; zM8++) {
-						in[i] |= state[x][y][zD8*8+zM8] << (7-zM8);
+						in[i] |= state[x][y][zD8*8+zM8] << (zM8);
 					}
 
 					i++;
