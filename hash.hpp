@@ -132,7 +132,7 @@ namespace sha3 {
 			for (int x = 0; x < 5; x++) {
 				for (int y = 0; y < 5; y++) {
 					for (int z = 0; z < _p.w; z++) {
-						a[x][y][z] = state[x][y][z] ^ ((a[(x+1)%5][y][z] ^ 1) & a[(x+2)%5][y][z]);
+						a[x][y][z] = state[x][y][z] ^ ((state[(x+1)%5][y][z] ^ 1) & state[(x+2)%5][y][z]);
 					}
 				}
 			}
