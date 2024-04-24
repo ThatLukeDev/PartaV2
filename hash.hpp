@@ -36,13 +36,13 @@ namespace sha3 {
 		for (int i = 1; i <= t % 255; i++) {
 			unsigned char R8 = R & 0b00000001;
 			R >>= 1;
-			R = setBit(R, 0, getBit(R, 0) ^ R8);
-			R = setBit(R, 4, getBit(R, 4) ^ R8);
-			R = setBit(R, 5, getBit(R, 5) ^ R8);
-			R = setBit(R, 6, getBit(R, 6) ^ R8);
+			R = setBit(R, 7-0, getBit(R, 7-0) ^ R8);
+			R = setBit(R, 7-4, getBit(R, 7-4) ^ R8);
+			R = setBit(R, 7-5, getBit(R, 7-5) ^ R8);
+			R = setBit(R, 7-6, getBit(R, 7-6) ^ R8);
 		}
 
-		return getBit(R, 0);
+		return getBit(R, 7-0);
 	}
 
 	void Rnd(unsigned char* in, int ir, params _p) {
@@ -144,7 +144,7 @@ namespace sha3 {
 		{
 			unsigned char RC[_p.w] = {0};
 
-			for (int j = 0; j < rT; j++) {
+			for (int j = 0; j <= rT; j++) {
 				RC[int(std::pow(2, j))-1] = rc(j + 7*ir);
 			}
 
