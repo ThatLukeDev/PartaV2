@@ -175,12 +175,8 @@ namespace sha3 {
 			}
 		}
 
-		int rcount4 = 0;
 		for (int ir = 12 + 2*rT - nr; ir < 12 + 2*rT; ir++) {
 			Rnd((unsigned char*)state, ir, _p);
-			rcount4++;
-			if (rcount4 > 1)
-				break;
 		}
 
 		int i = 0;
