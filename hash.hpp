@@ -194,18 +194,40 @@ namespace sha3 {
 		}
 	}
 
-	unsigned char* digest(unsigned char* _data, unsigned int _len, params _p) {
-		unsigned int blockSize = _p.rate / 8;
-		unsigned int blocks = std::ceil(double(_len + 2) / blockSize);
-		unsigned int dataSize = blocks * blockSize;
+	unsigned char* sponge(unsigned char* in, unsigned int len, unsigned int d, params _p) {
+		unsigned int r = _p.rate / 8;
+		unsigned int b = (_p.w / 8) * 25;
 
-		unsigned char* data = (unsigned char*)malloc(dataSize);
-		for (unsigned int i = 0; i < dataSize; i++) data[i] = 0;
-		memcpy(data, _data, _len);
-		data[_len] = 1;
-		data[dataSize - 1] = 1;
+		unsigned int n = std::ceil(double(len+2) / r);
+		unsigned int size = n * r;
 
-		return nullptr;
+		unsigned char P[size] = { 0 };
+		memcpy(P, in, len);
+		P[len] = 0b10000000;
+		P[size-1] = 0b1;
+
+		unsigned char S[b] = { 0 };
+
+		for (unsigned int i = 0; i < n; i++) {
+			for (int j = 0; j < r; j++) {
+				S[j] ^= P[i*r + j];
+			}
+			keccak_f(S, _p);
+		}
+
+		unsigned char* Z = (unsigned char*)malloc(d);
+
+		unsigned int prev = 0;
+		while (true) {
+			for (int i = 0; i < b; i++) {
+				int p = i + prev;
+				if (p >= d) {
+					return Z;
+				}
+				Z[p] = S[i];
+			}
+			prev += b;
+		}
 	}
 }
 
