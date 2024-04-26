@@ -5,10 +5,9 @@
 #include "base.hpp"
 
 int main() {
-	unsigned char inArr[200] = {0};
-	sha3::keccak_f(inArr, sha3::params());
-	std::cout << base16::encode(inArr, 200) << std::endl;
-	std::cout << "Hello World!" << std::endl;
+	unsigned char* inArr = (unsigned char*)"Keccak-224 Test Hash";
+	unsigned char* out = sha3::keccak(inArr, strlen((char*)inArr), 224, 448);
+	std::cout << base16::encode(out, 224/8) << std::endl;
 
 	return 0;
 }

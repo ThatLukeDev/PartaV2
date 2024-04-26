@@ -15,7 +15,9 @@ namespace sha3 {
 	}
 
 	struct params {
-		unsigned int rate;
+		unsigned int rate = 1600;
+		params(unsigned int _rate) : rate(_rate) { }
+		params() { }
 		unsigned int w = 64;
 	};
 
@@ -203,8 +205,8 @@ namespace sha3 {
 
 		unsigned char P[size] = { 0 };
 		memcpy(P, in, len);
-		P[len] = 0b10000000;
-		P[size-1] = 0b1;
+		P[len] = 0b1;//0b10000000;
+		P[size-1] |= 0b10000000;//0b1;
 
 		unsigned char S[b] = { 0 };
 
@@ -226,8 +228,13 @@ namespace sha3 {
 				}
 				Z[p] = S[i];
 			}
+			keccak_f(S, _p);
 			prev += b;
 		}
+	}
+
+	unsigned char* keccak(unsigned char* in, unsigned int len, unsigned int d, unsigned int c) {
+		return sponge(in, len, d, params(1600-c));
 	}
 }
 
