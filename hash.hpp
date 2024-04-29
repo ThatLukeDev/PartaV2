@@ -205,6 +205,7 @@ namespace sha3 {
 
 		unsigned char P[size] = { 0 };
 		memcpy(P, in, len);
+		// CHECK : Kyber spec states P[len] and P[size-1] should be inverted, however, this is not the case in all prod code.
 		P[len] = 0b1;//0b10000000;
 		P[size-1] |= 0b10000000;//0b1;
 
