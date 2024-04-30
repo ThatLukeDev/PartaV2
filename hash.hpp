@@ -15,10 +15,10 @@ namespace sha3 {
 	}
 
 	struct params {
-		bool sha3pad = false;
+		unsigned char pad = 0b1;
 		unsigned int rate = 1600;
 		params(unsigned int _rate) : rate(_rate) { }
-		params(unsigned int _rate, bool _s3p) : rate(_rate), sha3pad(_s3p) { }
+		params(unsigned int _rate, unsigned char _pad) : rate(_rate), pad(_pad) { }
 		params() { }
 		unsigned int w = 64;
 	};
@@ -208,12 +208,7 @@ namespace sha3 {
 		unsigned char P[size] = { 0 };
 		memcpy(P, in, len);
 		// Spec states P[len] and P[size-1] should be inverted, however, this is not the case.
-		if (_p.sha3pad) {
-			P[len] = 0b110;//0b01100000;
-		}
-		else {
-			P[len] = 0b1;//0b10000000;
-		}
+		P[len] = _p.pad;//0bx*1;
 		P[size-1] |= 0b10000000;//0b1;
 
 		unsigned char S[b] = { 0 };
@@ -245,8 +240,8 @@ namespace sha3 {
 		return sponge(in, len, d, params(1600-c));
 	}
 
-	unsigned char* sha3(unsigned char* in, unsigned int len, unsigned int v) {
-		return sponge(in, len, v, params(1600-(v*2), true));
+	unsigned char* digest(unsigned int v, unsigned char* in, unsigned int len) {
+		return sponge(in, len, v, params(1600-(v*2), 0b110));
 	}
 }
 
