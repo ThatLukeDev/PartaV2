@@ -247,6 +247,10 @@ namespace sha3 {
 	unsigned char* shake(unsigned int v, unsigned int d, unsigned char* in, unsigned int len) {
 		return sponge(in, len, d, params(1600-(v*2), 0b11111));
 	}
+
+	unsigned char* rawshake(unsigned int v, unsigned int d, unsigned char* in, unsigned int len) {
+		return sponge(in, len, d, params(1600-(v*2), 0b111));
+	}
 }
 
 #endif
