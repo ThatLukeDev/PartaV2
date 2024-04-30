@@ -220,13 +220,13 @@ namespace sha3 {
 			keccak_f(S, _p);
 		}
 
-		unsigned char* Z = (unsigned char*)malloc(d);
+		unsigned char* Z = (unsigned char*)malloc(d/8);
 
 		unsigned int prev = 0;
 		while (true) {
 			for (int i = 0; i < b; i++) {
 				int p = i + prev;
-				if (p >= d) {
+				if (p >= d/8) {
 					return Z;
 				}
 				Z[p] = S[i];
@@ -242,6 +242,10 @@ namespace sha3 {
 
 	unsigned char* digest(unsigned int v, unsigned char* in, unsigned int len) {
 		return sponge(in, len, v, params(1600-(v*2), 0b110));
+	}
+
+	unsigned char* shake(unsigned int v, unsigned int d, unsigned char* in, unsigned int len) {
+		return sponge(in, len, d, params(1600-(v*2), 0b11111));
 	}
 }
 
