@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "kyber.hpp"
-#include "hash.hpp"
+#include "sha3.hpp"
 #include "base.hpp"
 
 int main() {
