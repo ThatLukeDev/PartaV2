@@ -2776,10 +2776,13 @@ testVector tvs[] = {
 };
 
 int main() {
-	for (int i = 0; i < sizeof(tvs) / sizeof(testVector); i++) {
+	int fails = 0;
+	int arrlen = sizeof(tvs) / sizeof(testVector);
+	for (int i = 0; i < arrlen; i++) {
 		const char* result = base16::encode(sha3::digest(tvs[i].ver, tvs[i].msg, tvs[i].len/8), tvs[i].ver/8);
 		const char* wanted = base16::encode(tvs[i].out, tvs[i].ver/8);
 		if (strcmp(result, wanted) != 0) {
+			fails++;
 			std::cout << "Test failed" << std::endl;
 			std::cout << "SHA3-" << tvs[i].ver << " did not match" << std::endl;
 			std::cout << "Plaintext: " << base16::encode(tvs[i].msg, tvs[i].len/8) << std::endl;
@@ -2787,6 +2790,13 @@ int main() {
 			std::cout << "katAnswer: " << wanted << std::endl;
 		}
 	}
+	if (fails == 0) {
+		std::cout << "KAT pass" << std::endl;
+	}
+	else {
+		std::cout << "KAT fail" << std::endl;
+	}
+	std::cout << arrlen - fails << "/" << arrlen << " passed" << std::endl;
 
 	return 0;
 }
