@@ -1053,7 +1053,7 @@ testVector tvs[] = {
 	),
 	testVector(
 		256,
-		256,
+		256-4*8,
 		(unsigned char*)base16::decode("938fe6afdbf14d1229e03576e532f078898769e20620ae2164f5abfa"),
 		(unsigned char*)base16::decode("9511abd13c756772b852114578ef9b96f9dc7d0f2b8dcde6ea7d1bd14c518890")
 	),
