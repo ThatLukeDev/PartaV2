@@ -11,7 +11,8 @@ namespace base16 {
 	};
 
 	const char* encode(void* data, unsigned int size) {
-		char* _out = (char*)malloc(size * 2);
+		char* _out = (char*)malloc(size * 2 + 1);
+		_out[size*2] = 0;
 
 		for (unsigned int i = 0; i < size; i++) {
 			_out[i*2] = numerals[((unsigned char*)data)[i] / 16];
