@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "sha3.hpp"
 #include "base.hpp"
+#include "sha3.hpp"
 
 struct testVector {
 	unsigned int ver;
@@ -2786,6 +2786,7 @@ int main() {
 			std::cout << "Test failed" << std::endl;
 			std::cout << "SHA3-" << tvs[i].ver << " did not match" << std::endl;
 			std::cout << "Plaintext: " << base16::encode(tvs[i].msg, tvs[i].len/8) << std::endl;
+			std::cout << "Txtlength: " << tvs[i].len/8 << std::endl;
 			std::cout << "Generated: " << result << std::endl;
 			std::cout << "katAnswer: " << wanted << std::endl;
 		}

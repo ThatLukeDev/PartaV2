@@ -202,7 +202,7 @@ namespace sha3 {
 		unsigned int r = _p.rate / 8;
 		unsigned int b = (_p.w / 8) * 25;
 
-		unsigned int n = std::ceil(double(len+2) / r);
+		unsigned int n = std::ceil(double(len+1) / r);
 		unsigned int size = n * r;
 
 		unsigned char P[size] = { 0 };
