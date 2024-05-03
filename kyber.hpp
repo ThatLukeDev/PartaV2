@@ -9,6 +9,8 @@
 #include <vector>
 #include <random>
 
+#include "sha3.hpp"
+
 namespace kyber {
 	const int n = 256;
 	const int _n = 9;

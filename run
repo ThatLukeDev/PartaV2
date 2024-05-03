@@ -1,1 +1,1 @@
-g++ main.cpp -o parta.out && time ./parta.out
+make && echo && time ./parta.out
