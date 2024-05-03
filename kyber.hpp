@@ -108,6 +108,30 @@ namespace kyber {
 	int decompress(int x, int d) {
 		return std::round((q / double(std::pow(2, d))) * x);
 	}
+
+	unsigned char* xof(int v, unsigned int d, unsigned char* in, unsigned int len) {
+		return sha3::shake(128, d, in, len);
+	}
+
+	unsigned char* h(unsigned char* in, unsigned int len) {
+		return sha3::digest(256, in, len);
+	}
+
+	unsigned char* g(unsigned char* in, unsigned int len) {
+		return sha3::digest(512, in, len);
+	}
+
+	unsigned char* prf(unsigned int d, unsigned char* s, unsigned int slen, unsigned char* b, unsigned int blen) {
+		unsigned char S_B[slen + blen];
+		memcpy(S_B, s, slen);
+		memcpy(S_B + slen, b, blen);
+
+		return sha3::shake(256, d, S_B, slen + blen);
+	}
+
+	unsigned char* kdf(unsigned int d, unsigned char* in, unsigned int len) {
+		return shake(256, unsigned int d, unsigned char* in, unsigned int len) {
+	}
 }
 
 #endif
