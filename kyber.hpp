@@ -21,31 +21,31 @@ namespace kyber {
 		std::vector<unsigned char> _B(k*8);
 
 		for (unsigned int i = 0; i < k; i++) {
-			_B[i*8+0] = (B[i] & 0b00000001) ? 1 : 0;
-			_B[i*8+1] = (B[i] & 0b00000010) ? 1 : 0;
-			_B[i*8+2] = (B[i] & 0b00000100) ? 1 : 0;
-			_B[i*8+3] = (B[i] & 0b00001000) ? 1 : 0;
-			_B[i*8+4] = (B[i] & 0b00010000) ? 1 : 0;
-			_B[i*8+5] = (B[i] & 0b00100000) ? 1 : 0;
-			_B[i*8+6] = (B[i] & 0b01000000) ? 1 : 0;
-			_B[i*8+7] = (B[i] & 0b10000000) ? 1 : 0;
+			_B[i*8+0] = (B[i] & 0b10000000) ? 1 : 0;
+			_B[i*8+1] = (B[i] & 0b01000000) ? 1 : 0;
+			_B[i*8+2] = (B[i] & 0b00100000) ? 1 : 0;
+			_B[i*8+3] = (B[i] & 0b00010000) ? 1 : 0;
+			_B[i*8+4] = (B[i] & 0b00001000) ? 1 : 0;
+			_B[i*8+5] = (B[i] & 0b00000100) ? 1 : 0;
+			_B[i*8+6] = (B[i] & 0b00000010) ? 1 : 0;
+			_B[i*8+7] = (B[i] & 0b00000001) ? 1 : 0;
 		}
 
 		return _B;
 	}
 
-	std::vector<unsigned char> BytesToBits(std::vector<unsigned char> B) {
-		std::vector<unsigned char> _B(B.size() * 8);
+	std::vector<unsigned char> BitsToBytes(std::vector<unsigned char> B) {
+		std::vector<unsigned char> _B(B.size() / 8);
 
-		for (unsigned int i = 0; i < B.size(); i++) {
-			_B[i*8+0] = (B[i] & 0b00000001) ? 1 : 0;
-			_B[i*8+1] = (B[i] & 0b00000010) ? 1 : 0;
-			_B[i*8+2] = (B[i] & 0b00000100) ? 1 : 0;
-			_B[i*8+3] = (B[i] & 0b00001000) ? 1 : 0;
-			_B[i*8+4] = (B[i] & 0b00010000) ? 1 : 0;
-			_B[i*8+5] = (B[i] & 0b00100000) ? 1 : 0;
-			_B[i*8+6] = (B[i] & 0b01000000) ? 1 : 0;
-			_B[i*8+7] = (B[i] & 0b10000000) ? 1 : 0;
+		for (unsigned int i = 0; i < B.size() / 8; i++) {
+			_B[i] = B[i*8];
+			_B[i] |= B[i*8 + 1] << 1;
+			_B[i] |= B[i*8 + 2] << 2;
+			_B[i] |= B[i*8 + 3] << 3;
+			_B[i] |= B[i*8 + 4] << 4;
+			_B[i] |= B[i*8 + 5] << 5;
+			_B[i] |= B[i*8 + 6] << 6;
+			_B[i] |= B[i*8 + 7] << 7;
 		}
 
 		return _B;
