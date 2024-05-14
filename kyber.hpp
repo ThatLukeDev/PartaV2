@@ -110,14 +110,6 @@ namespace kyber {
 		return std::round((q / double(std::pow(2, d))) * x);
 	}
 
-	std::vector<int> ntt(std::vector<int> a) {
-		return a;
-	}
-
-	std::vector<int> intt(std::vector<int> a) {
-		return a;
-	}
-
 	unsigned char* xof(int v, unsigned int d, unsigned char* in, unsigned int len) {
 		return sha3::shake(128, d, in, len);
 	}
@@ -140,6 +132,28 @@ namespace kyber {
 
 	unsigned char* kdf(unsigned int d, unsigned char* in, unsigned int len) {
 		return sha3::shake(256, d, in, len);
+	}
+
+	std::vector<unsigned int> parse(unsigned char* in, unsigned int len) {
+		std::vector<unsigned int> ahat = std::vector<unsigned int>{ 0 };
+		int j = 0;
+
+		for (int i = 0; i < n; i += 3) {
+			int d1 = in[i] + 256 * reducePos(in[i+1], 16);
+			int d2 = in[i+1] / 16 + 16 * in[i+2];
+
+			if (d1 < q) {
+				ahat[j] = d1;
+				j++;
+			}
+
+			if (d2 < q && j < n) {
+				ahat[j] = d2;
+				j++;
+			}
+		}
+
+		return ahat;
 	}
 }
 
