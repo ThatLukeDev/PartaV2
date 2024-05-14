@@ -9,6 +9,7 @@
 #include <vector>
 #include <random>
 
+#include "matrices.hpp"
 #include "sha3.hpp"
 
 namespace kyber {
@@ -109,6 +110,14 @@ namespace kyber {
 		return std::round((q / double(std::pow(2, d))) * x);
 	}
 
+	std::vector<int> ntt(std::vector<int> a) {
+		return a;
+	}
+
+	std::vector<int> intt(std::vector<int> a) {
+		return a;
+	}
+
 	unsigned char* xof(int v, unsigned int d, unsigned char* in, unsigned int len) {
 		return sha3::shake(128, d, in, len);
 	}
@@ -130,7 +139,7 @@ namespace kyber {
 	}
 
 	unsigned char* kdf(unsigned int d, unsigned char* in, unsigned int len) {
-		return shake(256, unsigned int d, unsigned char* in, unsigned int len) {
+		return sha3::shake(256, d, in, len);
 	}
 }
 
