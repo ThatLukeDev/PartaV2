@@ -177,6 +177,20 @@ namespace kyber {
 
 		return f;
 	}
+
+	std::vector<int> decode(std::vector<unsigned char> in, unsigned int lex) {
+		std::vector<int> f = std::vector<int>(256, 0);
+
+		std::vector<unsigned char> bits = BytesToBits(in);
+
+		for (int i = 0; i < 256; i++) {
+			for (int j = 0; j < lex; j++) {
+				f[i] += bits[i * lex + j] * std::pow(2, j);
+			}
+		}
+
+		return f;
+	}
 }
 
 #endif
