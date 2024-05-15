@@ -17,10 +17,10 @@ namespace kyber {
 	const int _n = 9;
 	const int q = 3329;
 
-	std::vector<unsigned char> BytesToBits(unsigned char* B, unsigned int k) {
-		std::vector<unsigned char> _B(k*8);
+	std::vector<unsigned char> BytesToBits(std::vector<unsigned char> B) {
+		std::vector<unsigned char> _B(B.size()*8);
 
-		for (unsigned int i = 0; i < k; i++) {
+		for (unsigned int i = 0; i < B.size(); i++) {
 			_B[i*8+0] = (B[i] & 0b10000000) ? 1 : 0;
 			_B[i*8+1] = (B[i] & 0b01000000) ? 1 : 0;
 			_B[i*8+2] = (B[i] & 0b00100000) ? 1 : 0;
@@ -134,8 +134,8 @@ namespace kyber {
 		return sha3::shake(256, d, in, len);
 	}
 
-	std::vector<unsigned int> parse(unsigned char* in, unsigned int len) {
-		std::vector<unsigned int> ahat = std::vector<unsigned int>{ 0 };
+	std::vector<int> parse(unsigned char* in, unsigned int len) {
+		std::vector<int> ahat = std::vector<int>{ 0 };
 		int j = 0;
 
 		for (int i = 0; i < n; i += 3) {
@@ -154,6 +154,28 @@ namespace kyber {
 		}
 
 		return ahat;
+	}
+
+	std::vector<int> cbd(std::vector<unsigned char> in, unsigned int nex) {
+		std::vector<int> f = std::vector<int>(256);
+
+		std::vector<unsigned char> bits = BytesToBits(in);
+
+		for (int i = 0; i < 256; i++) {
+			int a = 0;
+			for (int j = 0; j < nex; j++) {
+				a += bits[2 * i * nex + j];
+			}
+
+			int b = 0;
+			for (int j = 0; j < nex; j++) {
+				b += bits[2 * i * nex + nex + j];
+			}
+
+			f[i] = a - b;
+		}
+
+		return f;
 	}
 }
 
