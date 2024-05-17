@@ -156,20 +156,20 @@ namespace kyber {
 		return ahat;
 	}
 
-	std::vector<int> cbd(std::vector<unsigned char> in, unsigned int nex) {
+	std::vector<int> cbd(std::vector<unsigned char> in, unsigned int eta) {
 		std::vector<int> f = std::vector<int>(256);
 
 		std::vector<unsigned char> bits = BytesToBits(in);
 
 		for (int i = 0; i < 256; i++) {
 			int a = 0;
-			for (int j = 0; j < nex; j++) {
-				a += bits[2 * i * nex + j];
+			for (int j = 0; j < eta; j++) {
+				a += bits[2 * i * eta + j];
 			}
 
 			int b = 0;
-			for (int j = 0; j < nex; j++) {
-				b += bits[2 * i * nex + nex + j];
+			for (int j = 0; j < eta; j++) {
+				b += bits[2 * i * eta + eta + j];
 			}
 
 			f[i] = a - b;
@@ -202,6 +202,15 @@ namespace kyber {
 		}
 
 		return f;
+	}
+
+	class CPAPKE {
+	public:
+		int k;
+		int eta1;
+		int eta2;
+		int du;
+		int dv;
 	}
 }
 
