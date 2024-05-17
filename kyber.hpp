@@ -191,6 +191,18 @@ namespace kyber {
 
 		return f;
 	}
+
+	std::vector<unsigned char> encode(std::vector<int> in, unsigned int lex) { // todo
+		std::vector<unsigned char> f = std::vector<unsigned char>();
+
+		for (int i = 0; i < 256; i++) {
+			for (int j = 0; j < lex; j++) {
+				f.push_back((unsigned char)(in[i] >> j) & 0b00000001);
+			}
+		}
+
+		return f;
+	}
 }
 
 #endif
