@@ -211,7 +211,7 @@ namespace kyber {
 		int eta2;
 		int du;
 		int dv;
-	}
+	};
 }
 
 #endif
