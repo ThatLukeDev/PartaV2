@@ -1,2 +1,2 @@
 # PartaV2
-An encryption program made in C++.
+A (soon-to-be) quantum safe encryption program written in Rust.
