@@ -38,7 +38,7 @@ impl NegacyclicRing {
     ///     12 // 3 ^ 4 mod 23
     /// )
     /// ```
-    pub fn power(&self, x: i32, y: i32) -> i32{
+    pub fn power(&self, x: i32, y: i32) -> i32 {
         match y {
             ..0 => panic!("termPower: y: Argument less than zero. Negative exponents are prohibited."),
             0 => 1,
@@ -58,5 +58,37 @@ impl NegacyclicRing {
                 working
             }
         }
+    }
+
+    /// Returns the primitive nth root of unity (if one exists).
+    ///
+    /// n is the primitive nth root of unity where:
+    /// - z^n = 1 mod q for any n
+    /// - z^k != 1 mod q for all k < n
+    /// where \ represents the primitive root
+    ///
+    /// ```
+    ///# use partav2::ring::*;
+    /// assert_eq!(
+    ///     NegacyclicRing::new(4, 7681).primitiventhunity(),
+    ///     Some(3383)
+    /// );
+    /// ```
+    pub fn primitiventhunity(&self) -> Option<i32> {
+        for root in 0..self.modulus {
+            if self.power(root, self.exponent.try_into().unwrap()) == 1 {
+                let mut taken = false;
+                for k in 1..self.exponent.try_into().unwrap() {
+                    if self.power(root, k) == 1 {
+                        taken = true;
+                    }
+                }
+                if !taken {
+                    return Some(root);
+                }
+            }
+        }
+
+        None
     }
 }
