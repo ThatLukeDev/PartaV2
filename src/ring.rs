@@ -62,10 +62,9 @@ impl NegacyclicRing {
 
     /// Returns the primitive nth root of unity (if one exists).
     ///
-    /// n is the primitive nth root of unity where:
-    /// - z^n = 1 mod q for any n
+    /// z is the primitive nth root of unity where:
+    /// - z^n = 1 mod q
     /// - z^k != 1 mod q for all k < n
-    /// where \ represents the primitive root
     ///
     /// ```
     ///# use partav2::ring::*;
@@ -86,6 +85,31 @@ impl NegacyclicRing {
                 if !taken {
                     return Some(root);
                 }
+            }
+        }
+
+        None
+    }
+
+    /// Returns the primitive 2nth root of unity (if one exists).
+    ///
+    /// z is the primitive 2nth root of unity where:
+    /// - z^2 = v mod q
+    /// - z^n = 1 mod q
+    ///
+    /// ```
+    ///# use partav2::ring::*;
+    /// assert_eq!(
+    ///     NegacyclicRing::new(4, 7681).primitive2nthunity(),
+    ///     Some(1925)
+    /// );
+    /// ```
+    pub fn primitive2nthunity(&self) -> Option<i32> {
+        let nthunity = self.primitiventhunity().unwrap();
+
+        for root in 0..self.modulus {
+            if self.power(root, 2) == nthunity && self.power(root, self.exponent.try_into().unwrap()) == self.modulus - 1 {
+                return Some(root);
             }
         }
 
