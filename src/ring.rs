@@ -115,4 +115,21 @@ impl NegacyclicRing {
 
         None
     }
+
+    /// Pads a polynomial to the correct length in a negacyclic ring.
+    ///
+    /// ```
+    ///# use partav2::ring::*;
+    /// assert_eq!(
+    ///     NegacyclicRing::new(3, 7681).pad(vec![1, 2, 3]),
+    ///     vec![1, 2, 3, 0, 0, 0, 0, 0] // 2 ^ 3 = 8
+    /// );
+    /// ```
+    pub fn pad(&self, val: Vec<i32>) -> Vec<i32> {
+        let mut out = val;
+
+        out.resize(self.size().try_into().unwrap(), 0);
+
+        out
+    }
 }
