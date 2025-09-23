@@ -132,4 +132,51 @@ impl NegacyclicRing {
 
         out
     }
+
+    /// Provides the bit reversal for NTT.
+    ///
+    /// ```
+    ///# use partav2::ring::*;
+    /// assert_eq!(
+    ///     NegacyclicRing::bit_reverse(7, 4),
+    ///     14 // 7: 0b0111 -> 14: 0b1110
+    /// );
+    /// ```
+    pub fn bit_reverse(x: i32, k: i32) -> i32 {
+        let mask = (1 << k) - 1;
+
+        let mut v = x & mask;
+        let mut out = 0;
+
+        for _ in 0..k {
+            out <<= 1;
+            out |= v & 1;
+            v >>= 1;
+        }
+
+        out
+    }
+
+    /// Provides the inverse of a number with respect to the modulus.
+    ///
+    /// ```
+    ///# use partav2::ring::*;
+    /// assert_eq!(
+    ///     NegacyclicRing::new(3, 7681).inverse(14),
+    ///     Some(1646)
+    /// );
+    /// assert_eq!(
+    ///     (1646 * 14) % 7681,
+    ///     1
+    /// );
+    /// ```
+    pub fn inverse(&self, x: i32) -> Option<i32> {
+        for i in 1..self.modulus {
+            if (i * x) % self.modulus == 1 {
+                return Some(i);
+            }
+        }
+
+        None
+    }
 }
