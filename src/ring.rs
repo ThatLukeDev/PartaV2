@@ -179,4 +179,51 @@ impl NegacyclicRing {
 
         None
     }
+
+    /// Number theoretic transform in the negacyclic ring.
+    ///
+    /// ```
+    ///# use partav2::ring::*;
+    /// assert_eq!(
+    ///     NegacyclicRing::new(4, 7681).ntt(vec![1, 2, 3, 4]),
+    ///     Some(vec![1467, 2807, 3471, 7621])
+    /// );
+    /// ```
+    pub fn ntt(&self, val: Vec<i32>) -> Option<Vec<i32>> {
+        let mut out = self.pad(val);
+
+        let rootunity = self.primitive2nthunity().unwrap();
+        let k: usize = self.exponent.try_into().unwrap();
+        let q = self.modulus;
+        let n: usize = self.size().try_into().unwrap();
+
+        let mut t: usize = n;
+        let mut m: usize = 1;
+        while m < n {
+            t /= 2;
+
+            for i in 0..m {
+                let j1 = 2 * i * t;
+                let j2 = j1 + t;
+                let s = self.power(rootunity, NegacyclicRing::bit_reverse((m + i).try_into().unwrap(), k.try_into().unwrap()));
+
+                for j in j1..j2 {
+                    let u = out[j];
+                    let v = out[j + t] * s;
+                    out[j] = (u + v) % q;
+                    out[j + t] = (u - v + q) % q;
+                }
+            }
+
+            m *= 2;
+        }
+
+        let mut ordered = vec![];
+
+        for i in 0..n {
+            ordered[<i32 as TryInto<usize>>::try_into(NegacyclicRing::bit_reverse(i.try_into().unwrap(), k.try_into().unwrap())).unwrap()] = out[i];
+        }
+
+        Some(ordered)
+    }
 }
