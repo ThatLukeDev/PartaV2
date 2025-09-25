@@ -218,10 +218,10 @@ impl NegacyclicRing {
             m *= 2;
         }
 
-        let mut ordered = vec![];
+        let mut ordered = vec![0; k];
 
-        for i in 0..n {
-            ordered[<i32 as TryInto<usize>>::try_into(NegacyclicRing::bit_reverse(i.try_into().unwrap(), k.try_into().unwrap())).unwrap()] = out[i];
+        for i in 0..k {
+            ordered[i] = out[<i32 as TryInto<usize>>::try_into(NegacyclicRing::bit_reverse(i.try_into().unwrap(), k.try_into().unwrap())).unwrap()];
         }
 
         Some(ordered)
