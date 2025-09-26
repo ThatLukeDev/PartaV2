@@ -204,10 +204,10 @@ impl NegacyclicRing {
 
             for i in 0..m {
                 let j1 = 2 * i * t;
-                let j2 = j1 + t - 1;
+                let j2 = j1 + t;
                 let s = self.power(rootunity, NegacyclicRing::bit_reverse((m + i).try_into().unwrap(), k.try_into().unwrap()));
 
-                for j in j1..=j2 {
+                for j in j1..j2 {
                     let u = out[j];
                     let v = out[j + t] * s;
                     out[j] = (u + v) % q;
@@ -228,5 +228,61 @@ impl NegacyclicRing {
         }
 
         Some(ordered)
+    }
+
+    /// Inverse number theoretic transform in the negacyclic ring.
+    ///
+    /// ```
+    ///# use partav2::ring::*;
+    /// assert_eq!(
+    ///     NegacyclicRing::new(2, 7681).intt(vec![1467, 2807, 3471, 7621]),
+    ///     Some(vec![1, 2, 3, 4])
+    /// );
+    /// ```
+    pub fn intt(&self, val: Vec<i32>) -> Option<Vec<i32>> {
+        let rootunity = self.inverse(self.primitive2nthunity().unwrap()).unwrap();
+        let inverse = self.inverse(self.size()).unwrap();
+        let k: usize = self.exponent.try_into().unwrap();
+        let q = self.modulus;
+        let n: usize = self.size().try_into().unwrap();
+
+        let mut out = vec![0; n];
+
+        for i in 0..n {
+            out[i] = val[<i32 as TryInto<usize>>::try_into(NegacyclicRing::bit_reverse(i.try_into().unwrap(), k.try_into().unwrap())).unwrap()];
+        }
+
+        let mut t: usize = 1;
+        let mut m: usize = n;
+        while m > 1 {
+            let mut j1 = 0;
+            let h = m / 2;
+
+            for i in 0..h {
+                let j2 = j1 + t;
+                let s = self.power(rootunity, NegacyclicRing::bit_reverse((h + i).try_into().unwrap(), k.try_into().unwrap()));
+
+                for j in j1..j2 {
+                    let u = out[j];
+                    let v = out[j + t];
+                    out[j] = (u + v) % q;
+                    out[j + t] = ((u - v) * s + q) % q;
+                }
+
+                j1 += t * 2;
+            }
+
+            t *= 2;
+            m /= 2;
+        }
+
+        for i in 0..n {
+            out[i] *= inverse;
+            out[i] %= self.modulus;
+            out[i] += self.modulus;
+            out[i] %= self.modulus;
+        }
+
+        Some(out)
     }
 }
