@@ -6,7 +6,7 @@ pub struct NegacyclicRing {
 }
 
 impl NegacyclicRing {
-    /// Creates a new negacyclic ring (form X^n + 1)_q from n and q.
+    /// Creates a new negacyclic ring (form X^(2^n) + 1)_q from n and q.
     pub fn new(n: u32, q: i32) -> Self {
         Self {
             modulus: q,
@@ -14,7 +14,7 @@ impl NegacyclicRing {
         }
     }
 
-    /// Gives the size of the key, or 2 ^ exponent.
+    /// Gives the size of the ring, or 2 ^ exponent.
     ///
     /// ```
     ///# use partav2::ring::*;
@@ -69,15 +69,15 @@ impl NegacyclicRing {
     /// ```
     ///# use partav2::ring::*;
     /// assert_eq!(
-    ///     NegacyclicRing::new(4, 7681).primitiventhunity(),
-    ///     Some(3383)
+    ///     NegacyclicRing::new(2, 7681).primitiventhunity(),
+    ///     Some(3383) // nth unity of X^(2^2) + 1
     /// );
     /// ```
     pub fn primitiventhunity(&self) -> Option<i32> {
         for root in 0..self.modulus {
-            if self.power(root, self.exponent.try_into().unwrap()) == 1 {
+            if self.power(root, self.size().try_into().unwrap()) == 1 {
                 let mut taken = false;
-                for k in 1..self.exponent.try_into().unwrap() {
+                for k in 1..self.size().try_into().unwrap() {
                     if self.power(root, k) == 1 {
                         taken = true;
                     }
@@ -100,15 +100,15 @@ impl NegacyclicRing {
     /// ```
     ///# use partav2::ring::*;
     /// assert_eq!(
-    ///     NegacyclicRing::new(4, 7681).primitive2nthunity(),
-    ///     Some(1925)
+    ///     NegacyclicRing::new(2, 7681).primitive2nthunity(),
+    ///     Some(1925) // 2nth unity of X^(2^2) + 1
     /// );
     /// ```
     pub fn primitive2nthunity(&self) -> Option<i32> {
         let nthunity = self.primitiventhunity().unwrap();
 
         for root in 0..self.modulus {
-            if self.power(root, 2) == nthunity && self.power(root, self.exponent.try_into().unwrap()) == self.modulus - 1 {
+            if self.power(root, 2) == nthunity && self.power(root, self.size().try_into().unwrap()) == self.modulus - 1 {
                 return Some(root);
             }
         }
@@ -185,7 +185,7 @@ impl NegacyclicRing {
     /// ```
     ///# use partav2::ring::*;
     /// assert_eq!(
-    ///     NegacyclicRing::new(4, 7681).ntt(vec![1, 2, 3, 4]),
+    ///     NegacyclicRing::new(2, 7681).ntt(vec![1, 2, 3, 4]),
     ///     Some(vec![1467, 2807, 3471, 7621])
     /// );
     /// ```
@@ -204,10 +204,10 @@ impl NegacyclicRing {
 
             for i in 0..m {
                 let j1 = 2 * i * t;
-                let j2 = j1 + t;
+                let j2 = j1 + t - 1;
                 let s = self.power(rootunity, NegacyclicRing::bit_reverse((m + i).try_into().unwrap(), k.try_into().unwrap()));
 
-                for j in j1..j2 {
+                for j in j1..=j2 {
                     let u = out[j];
                     let v = out[j + t] * s;
                     out[j] = (u + v) % q;
@@ -218,10 +218,13 @@ impl NegacyclicRing {
             m *= 2;
         }
 
-        let mut ordered = vec![0; k];
+        let mut ordered = vec![0; n];
 
-        for i in 0..k {
+        for i in 0..n {
             ordered[i] = out[<i32 as TryInto<usize>>::try_into(NegacyclicRing::bit_reverse(i.try_into().unwrap(), k.try_into().unwrap())).unwrap()];
+            ordered[i] %= self.modulus;
+            ordered[i] += self.modulus;
+            ordered[i] %= self.modulus;
         }
 
         Some(ordered)
