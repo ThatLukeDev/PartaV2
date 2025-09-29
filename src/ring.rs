@@ -249,7 +249,7 @@ impl NegacyclicRing {
         let mut out = vec![0; n];
 
         for i in 0..n {
-            out[i] = val[<i32 as TryInto<usize>>::try_into(NegacyclicRing::bit_reverse(i.try_into().unwrap(), k.try_into().unwrap())).unwrap()];
+            out[i] = val[<i32 as TryInto<usize>>::try_into(NegacyclicRing::bit_reverse(i.try_into().unwrap(), k.try_into().unwrap())).unwrap()] % q;
         }
 
         let mut t: usize = 1;
@@ -284,5 +284,49 @@ impl NegacyclicRing {
         }
 
         Some(out)
+    }
+
+    /// Multiplication of polynomials over a negacyclic ring.
+    ///
+    /// ```
+    ///# use partav2::ring::*;
+    /// assert_eq!(
+    ///     NegacyclicRing::new(3, 7681).mul(vec![1, 1], vec![0, 1]),
+    ///     Some(vec![0, 1, 1, 0, 0, 0, 0, 0])
+    /// );
+    /// ```
+    pub fn mul(&self, a: Vec<i32>, b: Vec<i32>) -> Option<Vec<i32>> {
+        let antt = self.ntt(a).unwrap();
+        let bntt = self.ntt(b).unwrap();
+
+        let mut outntt = vec![0; self.size().try_into().unwrap()];
+
+        for i in 0..outntt.len() {
+            outntt[i] = antt[i] * bntt[i];
+        }
+
+        self.intt(outntt)
+    }
+
+    /// Addition of polynomials over a negacyclic ring.
+    ///
+    /// ```
+    ///# use partav2::ring::*;
+    /// assert_eq!(
+    ///     NegacyclicRing::new(3, 7681).add(vec![1, 1], vec![0, 1]),
+    ///     Some(vec![1, 2, 0, 0, 0, 0, 0, 0])
+    /// );
+    /// ```
+    pub fn add(&self, a: Vec<i32>, b: Vec<i32>) -> Option<Vec<i32>> {
+        let antt = self.ntt(a).unwrap();
+        let bntt = self.ntt(b).unwrap();
+
+        let mut outntt = vec![0; self.size().try_into().unwrap()];
+
+        for i in 0..outntt.len() {
+            outntt[i] = antt[i] + bntt[i];
+        }
+
+        self.intt(outntt)
     }
 }
