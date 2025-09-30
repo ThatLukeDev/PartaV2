@@ -329,4 +329,9 @@ impl NegacyclicRing {
 
         self.intt(outntt)
     }
+
+    /// Gaussion polynomial sampling over a negacyclic ring.
+    pub fn sample(&self) -> Vec<i32> {
+        panic!("Not implemented");
+    }
 }
