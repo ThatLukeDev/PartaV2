@@ -44,4 +44,43 @@ impl ChaCha20 {
 
         out
     }
+
+    /// ChaCha20 block function on a state
+    ///
+    ///```
+    ///# use partav2::chacha::*;
+    /// assert_eq!(ChaCha20 {
+    ///         state: [
+    ///             0x61707865, 0x3320646e, 0x79622d32, 0x6b206574,
+    ///             0x03020100, 0x07060504, 0x0b0a0908, 0x0f0e0d0c,
+    ///             0x13121110, 0x17161514, 0x1b1a1918, 0x1f1e1d1c,
+    ///             0x00000001, 0x09000000, 0x4a000000, 0x00000000
+    ///         ]
+    ///     }.block(),
+    ///     ChaCha20 {
+    ///         state: [
+    ///             0x837778ab, 0xe238d763, 0xa67ae21e, 0x5950bb2f,
+    ///             0xc4f2d0c7, 0xfc62bb2f, 0x8fa018fc, 0x3f5ec7b7,
+    ///             0x335271c2, 0xf29489f3, 0xeabda8fc, 0x82e46ebd,
+    ///             0xd19c12b4, 0xb04e16de, 0x9e83d0cb, 0x4e3c50a2
+    ///         ]
+    ///     }
+    /// );
+    ///```
+    pub fn block(self) -> Self {
+        let mut out = self;
+
+        for _ in 0..10 {
+            out = out.quarter_round(0, 4, 8, 12);
+            out = out.quarter_round(1, 5, 9, 13);
+            out = out.quarter_round(2, 6, 10, 14);
+            out = out.quarter_round(3, 7, 11, 15);
+            out = out.quarter_round(0, 5, 10, 15);
+            out = out.quarter_round(1, 6, 11, 12);
+            out = out.quarter_round(2, 7, 8, 13);
+            out = out.quarter_round(3, 4, 9, 14);
+        }
+
+        out
+    }
 }
