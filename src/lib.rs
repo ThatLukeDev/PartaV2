@@ -3,5 +3,8 @@
 /// Contains representation of negacyclic polynomial rings, and utility functions.
 pub mod ring;
 
-/// An implementation of ChaCha20
+/// An implementation of ChaCha20.
 pub mod chacha;
+
+/// Random.
+pub mod rand;

@@ -5,6 +5,18 @@ pub struct ChaCha20 {
 }
 
 impl ChaCha20 {
+    /// A new chacha20 state.
+    pub fn new(key: [u32; 8], block: u32, nonce: [u32; 3]) -> Self {
+        ChaCha20 {
+            state: [
+                0x61707865, 0x3320646e, 0x79622d32, 0x6b206574,
+                key[0], key[1], key[2], key[3],
+                key[4], key[5], key[6], key[7],
+                block, nonce[0], nonce[1], nonce[2]
+            ]
+        }
+    }
+
     /// ChaCha20 quarter round on a state
     ///
     ///```
@@ -49,14 +61,11 @@ impl ChaCha20 {
     ///
     ///```
     ///# use partav2::chacha::*;
-    /// assert_eq!(ChaCha20 {
-    ///         state: [
-    ///             0x61707865, 0x3320646e, 0x79622d32, 0x6b206574,
-    ///             0x03020100, 0x07060504, 0x0b0a0908, 0x0f0e0d0c,
-    ///             0x13121110, 0x17161514, 0x1b1a1918, 0x1f1e1d1c,
-    ///             0x00000001, 0x09000000, 0x4a000000, 0x00000000
-    ///         ]
-    ///     }.block(),
+    /// assert_eq!(ChaCha20::new(
+    ///         [0x03020100, 0x07060504, 0x0b0a0908, 0x0f0e0d0c, 0x13121110, 0x17161514, 0x1b1a1918, 0x1f1e1d1c],
+    ///         1,
+    ///         [0x09000000, 0x4a000000, 0x00000000]
+    ///     ).block(),
     ///     ChaCha20 {
     ///         state: [
     ///             0x837778ab, 0xe238d763, 0xa67ae21e, 0x5950bb2f,
