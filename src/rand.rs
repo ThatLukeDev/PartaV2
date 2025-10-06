@@ -9,7 +9,9 @@ use crate::chacha::ChaCha20;
 #[derive(Debug)]
 pub struct Rand {
     pub seed: [u32; 8],
-    pub count: u32
+    pub count: u32,
+
+    pub buffer: Vec<u32>
 }
 
 impl Rand {
@@ -43,7 +45,9 @@ impl Rand {
 
         Self {
             seed: seed,
-            count: 1
+            count: 1,
+
+            buffer: vec![]
         }
     }
 
@@ -52,7 +56,7 @@ impl Rand {
     ///```
     ///# use partav2::rand::*;
     /// let mut rnd = Rand::new();
-    /// assert_ne!(rnd.sample(), rnd.sample());
+    /// rnd.sample();
     ///```
     pub fn sample(&mut self) -> [u32; 16] {
         let mut nonce: [u32; 3] = [0; 3];
@@ -69,5 +73,21 @@ impl Rand {
         self.count += 1;
 
         chacha.block().state
+    }
+
+    /// Takes a random number from the buffer, regenerating if necessary
+    ///
+    ///```
+    ///# use partav2::rand::*;
+    /// let mut rnd = Rand::new();
+    /// rnd.next();
+    ///```
+    pub fn next(&mut self) -> i32 {
+        if self.buffer.len() == 0 {
+            self.buffer = self.sample().into();
+        }
+
+        // We have just checked if empty
+        self.buffer.pop().unwrap() as i32
     }
 }
