@@ -15,7 +15,7 @@ impl Rand {
     ///
     ///```
     ///# use partav2::rand::*;
-    /// panic!("{:?}", Rand::new().seed);
+    /// Rand::new();
     ///```
     pub fn new() -> Self {
         let mut seed = [0u32; 8];
@@ -27,13 +27,17 @@ impl Rand {
 
         seed[0] = u32::from_le_bytes(epoch.to_le_bytes()[0..4].try_into().unwrap());
         seed[1] = u32::from_le_bytes(epoch.to_le_bytes()[4..8].try_into().unwrap());
+
         seed[2] = u32::from_le_bytes(heap.to_le_bytes()[0..4].try_into().unwrap());
         seed[3] = u32::from_le_bytes(heap.to_le_bytes()[4..8].try_into().unwrap());
+
         seed[4] = pid;
-        let rnd: [u8; 8];
-        OsRng.try_fill_bytes($mut rnd).unwrap();
-        seed[6] = u32::from_le_bytes(rnd.to_le_bytes()[0..4].try_into().unwrap());
-        seed[7] = u32::from_le_bytes(rnd.to_le_bytes()[4..8].try_into().unwrap());
+        seed[5] = 0x1f2e3d4c;
+
+        let mut rnd: [u8; 8] = [0; 8];
+        OsRng.try_fill_bytes(&mut rnd).unwrap();
+        seed[6] = u32::from_le_bytes(rnd[0..4].try_into().unwrap());
+        seed[7] = u32::from_le_bytes(rnd[4..8].try_into().unwrap());
 
         Self {
             seed: seed,
