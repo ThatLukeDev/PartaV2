@@ -3,6 +3,8 @@ use std::process;
 use rand::TryRngCore;
 use rand::rngs::OsRng;
 
+use crate::chacha::ChaCha20;
+
 /// Random generation
 #[derive(Debug)]
 pub struct Rand {
@@ -43,5 +45,29 @@ impl Rand {
             seed: seed,
             count: 1
         }
+    }
+
+    /// Random numbers
+    ///
+    ///```
+    ///# use partav2::rand::*;
+    /// let mut rnd = Rand::new();
+    /// assert_ne!(rnd.sample(), rnd.sample());
+    ///```
+    pub fn sample(&mut self) -> [u32; 16] {
+        let mut nonce: [u32; 3] = [0; 3];
+
+        let epoch: u128 = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_nanos();
+        let mut rnd: [u8; 4] = [0; 4];
+        OsRng.try_fill_bytes(&mut rnd).unwrap();
+
+        nonce[0] = u32::from_le_bytes(epoch.to_le_bytes()[0..4].try_into().unwrap());
+        nonce[1] = u32::from_le_bytes(epoch.to_le_bytes()[4..8].try_into().unwrap());
+        nonce[2] = u32::from_le_bytes(rnd);
+
+        let chacha = ChaCha20::new(self.seed, self.count, nonce);
+        self.count += 1;
+
+        chacha.block().state
     }
 }
