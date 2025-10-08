@@ -3,8 +3,8 @@ use crate::rand::Rand;
 /// A negcyclic polynomial ring type
 #[derive(Debug, Clone, Copy)]
 pub struct NegacyclicRing {
-    modulus: i32,
-    exponent: u32
+    pub modulus: i32,
+    pub exponent: u32
 }
 
 impl NegacyclicRing {

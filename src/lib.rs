@@ -1,10 +1,13 @@
 #![allow(dead_code)]
 
-/// Contains representation of negacyclic polynomial rings, and utility functions.
+/// Contains representation of negacyclic polynomial rings, and utility functions
 pub mod ring;
 
-/// An implementation of ChaCha20.
+/// An implementation of ChaCha20
 pub mod chacha;
 
-/// Random.
+/// Random
 pub mod rand;
+
+/// Ring learning with errors key exchange
+pub mod rlwe;
