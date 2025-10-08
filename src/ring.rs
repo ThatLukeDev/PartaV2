@@ -1,3 +1,5 @@
+use crate::rand::Rand;
+
 /// A negcyclic polynomial ring type
 #[derive(Debug, Clone, Copy)]
 pub struct NegacyclicRing {
@@ -331,7 +333,29 @@ impl NegacyclicRing {
     }
 
     /// Gaussion polynomial sampling over a negacyclic ring.
+    ///
+    /// ```
+    ///# use partav2::ring::*;
+    /// NegacyclicRing::new(3, 7681).sample();
+    /// ```
     pub fn sample(&self) -> Vec<i32> {
-        panic!("Not implemented");
+        let mut out = vec![0; self.size().try_into().unwrap()];
+
+        let mut rnd = Rand::new();
+
+        let sample_bound = 8.0 / (2.0 * std::f64::consts::PI).sqrt();
+
+        for i in 0..self.size().try_into().unwrap() {
+            let rnd1 = ((rnd.next() % 1000000000) as f64) / 1000000000.0;
+            let rnd2 = ((rnd.next() % 1000000000) as f64) / 1000000000.0;
+
+            out[i] = ((-2.0 * rnd1.ln()).sqrt() * (2.0 * std::f64::consts::PI * rnd2).cos() * sample_bound) as i32;
+
+            out[i] %= self.modulus;
+            out[i] += self.modulus;
+            out[i] %= self.modulus;
+        }
+
+        out
     }
 }
