@@ -27,4 +27,24 @@ impl NegacyclicRing {
 
         out
     }
+
+    /// Combines the key with the signal to generate a shared private key.
+    ///
+    /// ```
+    ///# use partav2::ring::*;
+    ///# use partav2::rlwe::*;
+    /// assert_eq!(
+    ///     NegacyclicRing::new(2, 7681).modulo2(vec![4, 1, 2, 3], vec![1, 2, 3, 4]),
+    ///     vec![0, 0, 1, 1]
+    /// );
+    /// ```
+    pub fn modulo2(&self, a: Vec<i32>, b: Vec<i32>) -> Vec<i32> {
+        let mut out = self.add(a, self.mul(b, vec![(self.modulus - 1) / 2]).unwrap()).unwrap();
+
+        for v in &mut out {
+            *v %= 2;
+        }
+
+        out
+    }
 }
