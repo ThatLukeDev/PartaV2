@@ -1,23 +1,5 @@
 use crate::ring::NegacyclicRing;
 
-pub struct RLWE;
-
-pub struct PublicKeypair {
-    a: Vec<i32>,
-    p: Vec<i32>
-}
-
-pub struct PrivateKeypair {
-    a: Vec<i32>,
-    s: Vec<i32>
-}
-
-pub trait KeyshareRLWE {
-    fn generate(ring: NegacyclicRing) -> (PrivateKeypair, PublicKeypair);
-    fn respond(ring: NegacyclicRing, key: PublicKeypair) -> (Vec<i32>, PublicKeypair);
-    fn parse(ring: NegacyclicRing, private: PrivateKeypair, public: PublicKeypair) -> Vec<i32>;
-}
-
 impl NegacyclicRing {
     /// Transforms the input polynomial to depth 1, and acts as the error correction for RLWE.
     ///
@@ -65,4 +47,27 @@ impl NegacyclicRing {
 
         out
     }
+}
+
+pub struct RLWE;
+
+pub struct PublicKeypair {
+    a: Vec<i32>,
+    p: Vec<i32>
+}
+
+pub struct PrivateKeypair {
+    a: Vec<i32>,
+    s: Vec<i32>
+}
+
+pub trait KeyshareRLWE {
+    fn generate(ring: NegacyclicRing) -> (PrivateKeypair, PublicKeypair);
+    fn respond(ring: NegacyclicRing, key: PublicKeypair) -> (Vec<i32>, PublicKeypair);
+    fn parse(ring: NegacyclicRing, private: PrivateKeypair, public: PublicKeypair) -> Vec<i32>;
+}
+
+pub trait TransmuteBytes {
+    fn from_bytes(bytes: Vec<u8>) -> Self;
+    fn to_bytes(self) -> Vec<u8>;
 }
