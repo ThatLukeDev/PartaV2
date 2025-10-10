@@ -51,11 +51,13 @@ impl NegacyclicRing {
 
 pub struct RLWE;
 
+#[derive(Clone, Debug, PartialEq)]
 pub struct PublicKeypair {
     a: Vec<i32>,
     p: Vec<i32>
 }
 
+#[derive(Clone, Debug, PartialEq)]
 pub struct PrivateKeypair {
     a: Vec<i32>,
     s: Vec<i32>
@@ -70,4 +72,101 @@ pub trait KeyshareRLWE {
 pub trait TransmuteBytes {
     fn from_bytes(bytes: Vec<u8>) -> Self;
     fn to_bytes(self) -> Vec<u8>;
+}
+
+impl TransmuteBytes for PublicKeypair {
+    fn from_bytes(bytes: Vec<u8>) -> Self {
+        let size = bytes.len() / size_of::<u32>() / 2;
+        assert_eq!(size * size_of::<u32>() * 2, bytes.len());
+
+        let mut out1 = vec![0; size];
+        let mut out2 = vec![0; size];
+
+        for i in 0..size {
+            out1[i] = i32::from_le_bytes(bytes[i * 4 .. i * 4 + 4].try_into().unwrap());
+            out2[i] = i32::from_le_bytes(bytes[size * 4 + i * 4 .. size * 4 + i * 4 + 4].try_into().unwrap());
+        }
+
+        PublicKeypair {
+            a: out1,
+            p: out2
+        }
+    }
+    fn to_bytes(self) -> Vec<u8> {
+        let mut bytes = vec![];
+
+        for i in 0..self.a.len() {
+            bytes.extend(self.a[i].to_le_bytes());
+        }
+        for i in 0..self.p.len() {
+            bytes.extend(self.p[i].to_le_bytes());
+        }
+
+        bytes
+    }
+}
+
+impl TransmuteBytes for PrivateKeypair {
+    fn from_bytes(bytes: Vec<u8>) -> Self {
+        let size = bytes.len() / size_of::<u32>() / 2;
+        assert_eq!(size * size_of::<u32>() * 2, bytes.len());
+
+        let mut out1 = vec![0; size];
+        let mut out2 = vec![0; size];
+
+        for i in 0..size {
+            out1[i] = i32::from_le_bytes(bytes[i * 4 .. i * 4 + 4].try_into().unwrap());
+            out2[i] = i32::from_le_bytes(bytes[size * 4 + i * 4 .. size * 4 + i * 4 + 4].try_into().unwrap());
+        }
+
+        PrivateKeypair {
+            a: out1,
+            s: out2
+        }
+    }
+    fn to_bytes(self) -> Vec<u8> {
+        let mut bytes = vec![];
+
+        for i in 0..self.a.len() {
+            bytes.extend(self.a[i].to_le_bytes());
+        }
+        for i in 0..self.s.len() {
+            bytes.extend(self.s[i].to_le_bytes());
+        }
+
+        bytes
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn bytes_transmute_public_keypair() {
+        let ring = NegacyclicRing::new(8, 7681);
+
+        for _ in 0..100 {
+            let keypair = PublicKeypair {
+                a: ring.sample(),
+                p: ring.sample()
+            };
+
+            assert_eq!(PublicKeypair::from_bytes(keypair.clone().to_bytes()), keypair);
+        }
+    }
+
+    #[test]
+    fn bytes_transmute_private_keypair() {
+        let ring = NegacyclicRing::new(8, 7681);
+
+        for _ in 0..100 {
+            let keypair = PrivateKeypair {
+                a: ring.sample(),
+                s: ring.sample()
+            };
+
+            assert_eq!(PrivateKeypair::from_bytes(keypair.clone().to_bytes()), keypair);
+        }
+    }
 }
