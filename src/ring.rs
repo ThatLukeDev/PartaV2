@@ -358,4 +358,28 @@ impl NegacyclicRing {
 
         out
     }
+
+    /// Regular polynomial sampling with respect to a negacyclic ring.
+    ///
+    /// ```
+    ///# use partav2::ring::*;
+    /// NegacyclicRing::new(3, 7681).rand();
+    /// ```
+    pub fn rand(&self) -> Vec<i32> {
+        let mut out = vec![0; self.size().try_into().unwrap()];
+
+        let mut rnd = Rand::new();
+
+        for i in 0..self.size().try_into().unwrap() {
+            let rnd1 = rnd.next();
+
+            out[i] = rnd1;
+
+            out[i] %= self.modulus;
+            out[i] += self.modulus;
+            out[i] %= self.modulus;
+        }
+
+        self.ntt(self.intt(out).unwrap()).unwrap()
+    }
 }

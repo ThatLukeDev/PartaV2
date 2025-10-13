@@ -138,6 +138,58 @@ impl TransmuteBytes for PrivateKeypair {
     }
 }
 
+impl KeyshareRLWE for RLWE {
+    fn generate(ring: NegacyclicRing) -> (PrivateKeypair, PublicKeypair) {
+        let a = ring.rand();
+
+        let s = ring.sample();
+        let e = ring.sample();
+
+        let p = ring.add(ring.mul(a.clone(), s.clone()).unwrap(), ring.mul(e, vec![2]).unwrap()).unwrap();
+
+        (
+            PrivateKeypair {
+                a: a.clone(),
+                s
+            },
+            PublicKeypair {
+                a,
+                p
+            }
+        )
+    }
+
+    fn respond(ring: NegacyclicRing, key: PublicKeypair) -> (Vec<i32>, PublicKeypair) {
+        let sr = ring.sample();
+        let er = ring.sample();
+
+        let pr = ring.add(ring.mul(key.a, sr.clone()).unwrap(), ring.mul(er, vec![2]).unwrap()).unwrap();
+
+        let e2r = ring.sample();
+        let kr = ring.add(ring.mul(key.p, sr).unwrap(), ring.mul(e2r, vec![2]).unwrap()).unwrap();
+
+        let w = ring.signal(kr.clone());
+        let skr = ring.modulo2(kr, w.clone());
+
+        (
+            skr,
+            PublicKeypair {
+                a: w,
+                p: pr
+            }
+        )
+    }
+
+    fn parse(ring: NegacyclicRing, private: PrivateKeypair, public: PublicKeypair) -> Vec<i32> {
+        let e2i = ring.sample();
+        let ki = ring.add(ring.mul(public.p, private.s).unwrap(), ring.mul(e2i, vec![2]).unwrap()).unwrap();
+
+        let ski = ring.modulo2(ki, public.a);
+
+        ski
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -167,6 +219,19 @@ mod tests {
             };
 
             assert_eq!(PrivateKeypair::from_bytes(keypair.clone().to_bytes()), keypair);
+        }
+    }
+
+    #[test]
+    fn key_exchange() {
+        for _ in 0..10 {
+            let ring = NegacyclicRing::new(9, 25601);
+
+            let (private1, public1) = RLWE::generate(ring);
+            let (key2, public2) = RLWE::respond(ring, public1);
+            let key1 = RLWE::parse(ring, private1, public2);
+
+            assert_eq!(key1, key2);
         }
     }
 }
