@@ -145,7 +145,8 @@ impl KeyshareRLWE for RLWE {
         let s = ring.sample();
         let e = ring.sample();
 
-        let p = ring.add(ring.mul(a.clone(), s.clone()).unwrap(), ring.mul(e, vec![2]).unwrap()).unwrap();
+        // let p = ring.add(ring.mul(a.clone(), s.clone()).unwrap(), ring.mul(e, vec![2]).unwrap()).unwrap();
+        let p = ring.intt(ring.ntt(a.clone()).unwrap().into_iter().zip(ring.ntt(s.clone()).unwrap()).map(|(a, b)| a * b).zip(ring.ntt(e).unwrap()).map(|(z, e)| z + e * 2).collect()).unwrap();
 
         (
             PrivateKeypair {
@@ -163,10 +164,12 @@ impl KeyshareRLWE for RLWE {
         let sr = ring.sample();
         let er = ring.sample();
 
-        let pr = ring.add(ring.mul(key.a, sr.clone()).unwrap(), ring.mul(er, vec![2]).unwrap()).unwrap();
+        // let pr = ring.add(ring.mul(key.a, sr.clone()).unwrap(), ring.mul(er, vec![2]).unwrap()).unwrap();
+        let pr = ring.intt(ring.ntt(key.a).unwrap().into_iter().zip(ring.ntt(sr.clone()).unwrap()).map(|(a, b)| a * b).zip(ring.ntt(er).unwrap()).map(|(z, e)| z + e * 2).collect()).unwrap();
 
         let e2r = ring.sample();
-        let kr = ring.add(ring.mul(key.p, sr).unwrap(), ring.mul(e2r, vec![2]).unwrap()).unwrap();
+        // let kr = ring.add(ring.mul(key.p, sr).unwrap(), ring.mul(e2r, vec![2]).unwrap()).unwrap();
+        let kr = ring.intt(ring.ntt(key.p).unwrap().into_iter().zip(ring.ntt(sr).unwrap()).map(|(a, b)| a * b).zip(ring.ntt(e2r).unwrap()).map(|(z, e)| z + e * 2).collect()).unwrap();
 
         let w = ring.signal(kr.clone());
         let skr = ring.modulo2(kr, w.clone());
@@ -182,7 +185,8 @@ impl KeyshareRLWE for RLWE {
 
     fn parse(ring: NegacyclicRing, private: PrivateKeypair, public: PublicKeypair) -> Vec<i32> {
         let e2i = ring.sample();
-        let ki = ring.add(ring.mul(public.p, private.s).unwrap(), ring.mul(e2i, vec![2]).unwrap()).unwrap();
+        // let ki = ring.add(ring.mul(public.p, private.s).unwrap(), ring.mul(e2i, vec![2]).unwrap()).unwrap();
+        let ki = ring.intt(ring.ntt(public.p).unwrap().into_iter().zip(ring.ntt(private.s).unwrap()).map(|(a, b)| a * b).zip(ring.ntt(e2i).unwrap()).map(|(z, e)| z + e * 2).collect()).unwrap();
 
         let ski = ring.modulo2(ki, public.a);
 
