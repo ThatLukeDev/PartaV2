@@ -4,7 +4,7 @@ use partav2::rlwe::*;
 use std::time::SystemTime;
 
 fn main() {
-    const ITERATIONS: i32 = 10;
+    const ITERATIONS: i32 = 1000;
     let start = SystemTime::now();
 
     for _ in 0..ITERATIONS {
@@ -17,5 +17,5 @@ fn main() {
         assert_eq!(key1, key2);
     }
 
-    println!("{}ms per keyshare", start.elapsed().unwrap().as_millis() as i32 / ITERATIONS);
+    println!("{} iterations: {}ms/keyshare", ITERATIONS, (start.elapsed().unwrap().as_micros() as f32 / 1000f32 / ITERATIONS as f32 * 10f32).round() / 10f32);
 }
