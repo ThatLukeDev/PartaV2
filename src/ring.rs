@@ -1,7 +1,7 @@
 use crate::rand::Rand;
 
 /// A negcyclic polynomial ring type
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct NegacyclicRing {
     pub modulus: i32,
     pub exponent: u32
