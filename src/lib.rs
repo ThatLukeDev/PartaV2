@@ -18,8 +18,6 @@ pub mod rlwe;
 pub enum Security {
     /// Equivelent to 128-bit RSA
     Medium,
-    /// Equivelent to 256-bit RSA
-    High,
     /// You must make sure that the exponent and modulus form a negacyclic ring
     /// with a 2n-th root of unity
     Custom(u32, i32)
@@ -32,18 +30,15 @@ impl Security {
     ///# use partav2::ring::*;
     ///# use partav2::*;
     /// assert_eq!(Security::Medium.ring(), NegacyclicRing::new(9, 25601));
-    /// assert_eq!(Security::High.ring(), NegacyclicRing::new(10, 40961));
     ///```
     pub fn ring(&self) -> NegacyclicRing {
         NegacyclicRing::new(
             match self {
                 Security::Medium => 9,
-                Security::High => 10,
                 Security::Custom(pow2, _mod2) => *pow2
             },
             match self {
                 Security::Medium => 25601,
-                Security::High => 40961,
                 Security::Custom(_pow2, mod2) => *mod2
             }
         )
@@ -55,7 +50,7 @@ impl Security {
 /// request(security) -> (private, request)
 ///
 ///```
-/// let (private1, public1) = partav2::request(partav2::Security::High);
+/// let (private1, public1) = partav2::request(partav2::Security::Medium);
 ///```
 pub fn request(level: Security) -> (Vec<u8>, Vec<u8>) {
     let ring = level.ring();
@@ -74,7 +69,7 @@ pub fn request(level: Security) -> (Vec<u8>, Vec<u8>) {
 /// respond(request) -> (key, response)
 ///
 ///```
-///#let (private1, public1) = partav2::request(partav2::Security::High);
+///# let (private1, public1) = partav2::request(partav2::Security::Medium);
 /// let (key2, public2) = partav2::respond(public1);
 ///```
 pub fn respond(request: Vec<u8>) -> (Vec<u8>, Vec<u8>) {
@@ -92,7 +87,12 @@ pub fn respond(request: Vec<u8>) -> (Vec<u8>, Vec<u8>) {
         key.extend(key1[i].to_le_bytes());
     }
 
-    (key, response.to_bytes())
+    let mut public = vec![];
+    public.extend(ring.modulus.to_le_bytes());
+    public.extend(ring.exponent.to_le_bytes());
+    public.extend(response.to_bytes());
+
+    (key, public)
 }
 
 /// Parses the response keypair
@@ -100,9 +100,9 @@ pub fn respond(request: Vec<u8>) -> (Vec<u8>, Vec<u8>) {
 /// finalise(rprivate, response) -> key
 ///
 ///```
-/// let (private1, public1) = partav2::request(partav2::Security::High);
+/// let (private1, public1) = partav2::request(partav2::Security::Medium);
 /// let (key2, public2) = partav2::respond(public1);
-/// let key1 = partav2::respond(private1, public2);
+/// let key1 = partav2::finalise(private1, public2);
 ///
 /// assert_eq!(key1, key2);
 ///```
