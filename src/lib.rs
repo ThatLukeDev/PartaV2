@@ -83,8 +83,12 @@ pub fn respond(request: Vec<u8>) -> (Vec<u8>, Vec<u8>) {
 
     let mut key = vec![];
 
-    for i in 0..key1.len() {
-        key.extend(key1[i].to_le_bytes());
+    for i in 0..(key1.len() / 8) {
+        let mut val: u8 = 0;
+        for j in 0..8 {
+            val |= (key1[i * 8 + j] << j) as u8;
+        }
+        key.push(val);
     }
 
     let mut public = vec![];
@@ -117,8 +121,12 @@ pub fn finalise(private: Vec<u8>, request: Vec<u8>) -> Vec<u8> {
 
     let mut key = vec![];
 
-    for i in 0..key1.len() {
-        key.extend(key1[i].to_le_bytes());
+    for i in 0..(key1.len() / 8) {
+        let mut val: u8 = 0;
+        for j in 0..8 {
+            val |= (key1[i * 8 + j] << j) as u8;
+        }
+        key.push(val);
     }
 
     key
